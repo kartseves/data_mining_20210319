@@ -51,6 +51,15 @@ def hh_company_desc(items):
     return "".join(items).replace("\xa0", " ")
 
 
+def get_params(item: str) -> dict:
+    selector = Selector(text=item)
+    data = {
+        "name": selector.xpath('//span[@class="item-params-label"]/text()').extract_first(),
+        "value": selector.xpath('//li[@class="item-params-list-item"]/text()').extract_first(),
+    }
+    return data
+
+
 class AutoyoulaLoader(ItemLoader):
     default_item_class = dict
     url_out = TakeFirst()
@@ -82,3 +91,8 @@ class HhVacancyLoader(ItemLoader):
 
 class AvitoLoader(ItemLoader):
     default_item_class = dict
+    url_out = TakeFirst()
+    title_out = TakeFirst()
+    price_out = TakeFirst()
+    address_out = TakeFirst()
+    params_in = MapCompose(get_params)

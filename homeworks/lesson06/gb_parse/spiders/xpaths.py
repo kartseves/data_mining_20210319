@@ -47,8 +47,8 @@ HH_VACANCY_XPATH = {
     "author": '//a[@data-qa="vacancy-company-name"]/@href',
 }
 
-AVITO_PAGE_XPATH = {
-}
-
 AVITO_FLAT_XPATH = {
+    "title": '//div[@class="title-info-main"]/span/text()',
+    "address": '//div[@class="item-address"]/span[@class="item-address__string"]/text()',
+    "params": '//div[@class="item-params"]',
 }
