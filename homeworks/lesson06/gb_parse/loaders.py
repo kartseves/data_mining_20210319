@@ -55,7 +55,7 @@ def get_params(item: str) -> dict:
     selector = Selector(text=item)
     data = {
         "name": selector.xpath('//span[@class="item-params-label"]/text()').extract_first(),
-        "value": selector.xpath('//li[@class="item-params-list-item"]/text()').extract_first(),
+        "value": selector.xpath('//li/text()').extract()[1].replace("\xa0", " "),
     }
     return data
 

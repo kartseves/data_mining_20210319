@@ -48,7 +48,7 @@ HH_VACANCY_XPATH = {
 }
 
 AVITO_FLAT_XPATH = {
-    "title": '//div[@class="title-info-main"]/span/text()',
+    "title": '//h1[@class="title-info-title"]/span/text()',
     "address": '//div[@class="item-address"]/span[@class="item-address__string"]/text()',
-    "params": '//div[@class="item-params"]',
+    "params": '//div[@class="item-params"]//ul[@class="item-params-list"]//li[@class="item-params-list-item"]',
 }

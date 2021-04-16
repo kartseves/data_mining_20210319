@@ -9,7 +9,7 @@ from ..spiders.xpaths import AVITO_FLAT_XPATH
 class AvitoSpider(scrapy.Spider):
     name = "avito"
     allowed_domains = ["www.avito.ru"]
-    start_urls = ["https://www.avito.ru/omsk/kvartiry/prodam"]
+    start_urls = ["https://www.avito.ru/omsk/nedvizhimost"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -23,12 +23,17 @@ class AvitoSpider(scrapy.Spider):
         yield response.follow(f"{base_url}?p={self.page_num}", callback=callback)
 
     def parse(self, response, *args, **kwargs):
+        json_data = json.loads(response.xpath('//div[@class="js-initial"]/@data-state').extract_first())
+        start_link = json_data.get('rubricators').get('rubricatorCategories')[0].get('subs')[0].get('url')
+        yield response.follow(urljoin(response.url, start_link), callback=self.parse_prodam)
+
+    def parse_prodam(self, response):
         try:
             json_data = json.loads(response.xpath('//div[@class="js-initial"]/@data-state').extract_first())
             catalog = json_data.get('catalog', {})
             items = catalog.get('items')
             if items:
-                yield response.follow(urljoin(response.url, catalog.get('pager').get('next')), self.parse)
+                yield response.follow(urljoin(response.url, catalog.get('pager').get('next')), self.parse_prodam)
                 for item in items:
                     item_type = item.get('type')
                     if item_type == 'item':
@@ -43,9 +48,9 @@ class AvitoSpider(scrapy.Spider):
                                 self.flat_data['price'] = item.get('priceDetailed').get('value')
                                 yield response.follow(urljoin(response.url, vip_item.get('urlPath')), self.flat_parse)
             else:
-                yield self._get_follow(response, self.parse)
+                yield self._get_follow(response, self.parse_prodam)
         except (ValueError, KeyError, AttributeError):
-            yield self._get_follow(response, self.parse)
+            yield self._get_follow(response, self.parse_prodam)
 
     def flat_parse(self, response):
         self.coll_name = "flat"
